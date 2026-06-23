@@ -20,7 +20,7 @@ final class WatchtimeTracker {
         let chars = "abcdefghijklmnopqrstuvwxyz"
             + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
         return String(
-            (0..<16).compactMap { _ in
+            (0 ..< 16).compactMap { _ in
                 Array(chars).randomElement()
             }
         )
@@ -30,13 +30,13 @@ final class WatchtimeTracker {
         stop()
         self.videoId = videoId
         self.urls = urls
-        self.sessionStart = Date()
+        sessionStart = Date()
         sendPlaybackPing(urls: urls)
         DispatchQueue.main.async { [weak self] in
             guard let self else {
                 return
             }
-            self.pingTimer = Timer.scheduledTimer(
+            pingTimer = Timer.scheduledTimer(
                 withTimeInterval: Self.pingInterval,
                 repeats: true
             ) { [weak self] _ in
@@ -78,7 +78,6 @@ final class WatchtimeTracker {
             + "&cmt=\(fmt(pos))&el=detailpage"
             + "&st=0&et=\(fmt(pos))"
         fire(baseURL: urls.watchtimeURL, extra: extra)
-        updateLocalProgress(position: pos, urls: urls)
         AppLog.log(
             "Watchtime",
             "watchtime ping sent pos=\(Int(pos))s"
@@ -97,27 +96,9 @@ final class WatchtimeTracker {
             + "&cmt=\(fmt(pos))&el=detailpage"
             + "&st=0&et=\(fmt(pos))"
         fire(baseURL: urls.watchtimeURL, extra: extra)
-        updateLocalProgress(position: pos, urls: urls)
         AppLog.log(
             "Watchtime",
             "final ping pos=\(Int(pos))s"
-        )
-    }
-
-    private func updateLocalProgress(
-        position: TimeInterval,
-        urls: WatchtimeURLs
-    ) {
-        guard let videoId,
-              let duration = urls.duration,
-              duration > 0
-        else {
-            return
-        }
-        WatchProgressStore.shared.setProgress(
-            videoId: videoId,
-            position: position,
-            duration: duration
         )
     }
 
@@ -133,7 +114,7 @@ final class WatchtimeTracker {
         }
         OAuthClient.shared.validToken { result in
             var req = URLRequest(url: url)
-            if case .success(let token) = result {
+            if case let .success(token) = result {
                 req.setValue(
                     "Bearer \(token)",
                     forHTTPHeaderField: "Authorization"

@@ -239,28 +239,35 @@ private extension InnertubeClient {
     static func extractProgressFromOverlays(
         _ overlays: [[String: Any]]
     ) -> Double? {
-        let key = RendererKey.thumbnailOverlayTimeStatus
         for overlay in overlays {
+            if let pct = overlayPercentWatched(overlay) {
+                return pct
+            }
+        }
+        return nil
+    }
+
+    private static func overlayPercentWatched(
+        _ overlay: [String: Any]
+    ) -> Double? {
+        let keys = [
+            "thumbnailOverlayResumePlaybackRenderer",
+            RendererKey.thumbnailOverlayTimeStatus
+        ]
+        for key in keys {
             guard let renderer = overlay[key]
                 as? [String: Any]
             else {
                 continue
             }
-            if let frac = renderer[
+            if let raw = renderer[
                 "percentDurationWatched"
             ] as? Double {
-                if frac > 0.03, frac < 0.97 {
+                let frac = raw > 1 ? raw / 100.0 : raw
+                if frac > 0.03 {
                     return frac
                 }
                 return nil
-            }
-            if let text = renderer["text"]
-                as? [String: Any],
-               let simple = text[JSONKey.simpleText]
-                   as? String,
-               simple.contains("/") == false,
-               (renderer["style"] as? String) == "RED" {
-                return 0.5
             }
         }
         return nil

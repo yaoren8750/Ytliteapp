@@ -48,7 +48,8 @@ enum VideoRendererParserChain {
     ///   • richItemRenderer/content/videoRenderer with reelWatchEndpoint navigation
     static func isShortFeedItem(_ item: [String: Any]) -> Bool {
         guard let ri = item[RendererKey.richItem] as? [String: Any],
-              let content = ri[JSONKey.content] as? [String: Any] else {
+              let content = ri[JSONKey.content] as? [String: Any]
+        else {
             return false
         }
         if content["reelItemRenderer"] != nil
@@ -78,23 +79,125 @@ enum VideoRendererParserChain {
 
     /// Convenience: maps a list of items to videos, skipping unrecognised items.
     /// Shorts (reelItemRenderer) are excluded unless the showShorts setting is on.
+    /// Also extracts inline watch progress from thumbnail overlays.
     static func videos(from items: [[String: Any]]) -> [Video] {
-        filtered(items).compactMap { video(from: $0) }
+        let filtered = filtered(items)
+        return filtered.compactMap { item in
+            if let parsed = video(from: item) {
+                storeInlineProgress(
+                    item: item, videoId: parsed.id
+                )
+                return parsed
+            }
+            return nil
+        }
     }
 
     /// Convenience: maps items to videos AND extracts the first continuation token found.
     /// Shorts (reelItemRenderer) are excluded unless the showShorts setting is on.
+    /// Also extracts inline watch progress from thumbnail overlays.
     static func parse(items: [[String: Any]]) -> (videos: [Video], continuation: String?) {
         var videos: [Video] = []
         var continuation: String?
         for item in filtered(items) {
-            if let video = video(from: item) {
-                videos.append(video)
-            } else if continuation == nil, let token = Self.continuation(from: item) {
+            if let parsed = video(from: item) {
+                storeInlineProgress(
+                    item: item, videoId: parsed.id
+                )
+                videos.append(parsed)
+            } else if continuation == nil,
+                      let token = Self.continuation(from: item) {
                 continuation = token
             }
         }
         return (videos, continuation)
+    }
+
+    /// Extracts `percentDurationWatched` from
+    /// `thumbnailOverlayResumePlaybackRenderer` in a raw
+    /// browse item and stores it in WatchProgressStore.
+    private static func storeInlineProgress(
+        item: [String: Any],
+        videoId: String
+    ) {
+        let overlays = extractOverlays(from: item)
+        guard let frac = extractResumeFraction(
+            overlays
+        ),
+            frac > 0.03
+        else {
+            return
+        }
+        WatchProgressStore.shared.setFraction(
+            videoId: videoId, fraction: frac
+        )
+    }
+
+    private static func rendererOverlays(
+        _ dict: [String: Any]?
+    ) -> [[String: Any]] {
+        dict?["thumbnailOverlays"]
+            as? [[String: Any]] ?? []
+    }
+
+    private static func extractOverlays(
+        from item: [String: Any]
+    ) -> [[String: Any]] {
+        if let ri = item[RendererKey.richItem]
+            as? [String: Any],
+           let content = ri[JSONKey.content]
+            as? [String: Any] {
+            return rendererOverlays(
+                content[RendererKey.video]
+                    as? [String: Any]
+            )
+        }
+        if let vr = item[RendererKey.video]
+            as? [String: Any] {
+            return rendererOverlays(vr)
+        }
+        if let vr = item[RendererKey.compactVideo]
+            as? [String: Any] {
+            return rendererOverlays(vr)
+        }
+        if let vr = item["gridVideoRenderer"]
+            as? [String: Any] {
+            return rendererOverlays(vr)
+        }
+        if let tile = item[RendererKey.tile]
+            as? [String: Any] {
+            let hdr = tile.digDict(
+                JSONKey.header,
+                RendererKey.tileHeader
+            )
+            return rendererOverlays(hdr)
+        }
+        return []
+    }
+
+    private static func extractResumeFraction(
+        _ overlays: [[String: Any]]
+    ) -> Double? {
+        let keys = [
+            "thumbnailOverlayResumePlaybackRenderer",
+            RendererKey.thumbnailOverlayTimeStatus
+        ]
+        for overlay in overlays {
+            for key in keys {
+                guard let renderer = overlay[key]
+                    as? [String: Any]
+                else {
+                    continue
+                }
+                if let raw = renderer[
+                    "percentDurationWatched"
+                ] as? Double {
+                    return raw > 1
+                        ? raw / 100.0 : raw
+                }
+            }
+        }
+        return nil
     }
 
     // MARK: - Private

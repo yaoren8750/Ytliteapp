@@ -115,15 +115,26 @@ extension WatchViewController {
         else {
             return
         }
+        let duration = CMTimeGetSeconds(
+            player.currentItem?.duration ?? .zero
+        )
+        guard duration > 0 else {
+            return
+        }
         didSeekToSavedPosition = true
+        let position = prog.fraction * duration
         let target = CMTime(
-            seconds: prog.position,
+            seconds: position,
             preferredTimescale: 1_000
         )
         player.seek(
             to: target,
             toleranceBefore: .zero,
             toleranceAfter: .zero
+        )
+        AppLog.player(
+            "resumed at \(Int(position))s"
+                + " (\(Int(prog.fraction * 100))%)"
         )
     }
 

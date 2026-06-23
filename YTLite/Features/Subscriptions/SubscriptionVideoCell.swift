@@ -3,12 +3,15 @@ import UIKit
 class SubscriptionVideoCell: UITableViewCell {
     static let reuseId = "SubscriptionVideoCell"
 
-    private let thumbnail = ThumbnailImageView(frame: .zero)
-    private let durationLabel = UILabel()
-    private let channelAvatarView = ThumbnailImageView(frame: .zero)
-    private let titleLabel = UILabel()
-    private let channelLabel = UILabel()
-    private let dateLabel = UILabel()
+    let thumbnail = ThumbnailImageView(frame: .zero)
+    let durationLabel = UILabel()
+    let progressTrack = UIView()
+    let progressFill = UIView()
+    var watchFraction: CGFloat = 0
+    let channelAvatarView = ThumbnailImageView(frame: .zero)
+    let titleLabel = UILabel()
+    let channelLabel = UILabel()
+    let dateLabel = UILabel()
     private var representedChannelId: String?
     var onChannelTap: (() -> Void)?
 
@@ -30,11 +33,29 @@ class SubscriptionVideoCell: UITableViewCell {
 
     private func setupUI() {
         selectionStyle = .none
-
         thumbnail.layer.cornerRadius = 0
         thumbnail.layer.masksToBounds = true
         contentView.addSubview(thumbnail)
+        setupProgressBar()
+        setupDurationLabel()
+        setupChannelAvatar()
+        setupLabels()
+        setupTapGestures()
+        applyTheme()
+    }
 
+    private func setupProgressBar() {
+        progressTrack.backgroundColor = UIColor.black
+            .withAlphaComponent(0.3)
+        progressTrack.isHidden = true
+        thumbnail.addSubview(progressTrack)
+        progressFill.backgroundColor = UIColor(
+            red: 1, green: 0, blue: 0, alpha: 1
+        )
+        thumbnail.addSubview(progressFill)
+    }
+
+    private func setupDurationLabel() {
         durationLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
         durationLabel.textColor = .white
         durationLabel.backgroundColor = ThemeManager.shared.durationBackground
@@ -42,131 +63,31 @@ class SubscriptionVideoCell: UITableViewCell {
         durationLabel.layer.masksToBounds = true
         durationLabel.textAlignment = .center
         thumbnail.addSubview(durationLabel)
+    }
 
+    private func setupChannelAvatar() {
         channelAvatarView.layer.cornerRadius = 18
         channelAvatarView.layer.masksToBounds = true
         channelAvatarView.isUserInteractionEnabled = true
         contentView.addSubview(channelAvatarView)
+    }
 
+    private func setupLabels() {
         titleLabel.numberOfLines = 2
         titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         contentView.addSubview(titleLabel)
-
         channelLabel.font = UIFont.systemFont(ofSize: 12)
         channelLabel.isUserInteractionEnabled = true
         contentView.addSubview(channelLabel)
-
         dateLabel.font = UIFont.systemFont(ofSize: 12)
         contentView.addSubview(dateLabel)
+    }
 
+    private func setupTapGestures() {
         let avatarTap = UITapGestureRecognizer(target: self, action: #selector(handleChannelTap))
         channelAvatarView.addGestureRecognizer(avatarTap)
         let labelTap = UITapGestureRecognizer(target: self, action: #selector(handleChannelTap))
         channelLabel.addGestureRecognizer(labelTap)
-
-        applyTheme()
-    }
-
-    // MARK: - Manual layout
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        let width = contentView.bounds.width
-        if width > 500 {
-            layoutHorizontal(width: width)
-        } else {
-            layoutVertical(width: width)
-        }
-    }
-
-    override func sizeThatFits(_ size: CGSize) -> CGSize {
-        let width = size.width
-        if width > 500 {
-            return CGSize(width: width, height: 220)
-        } else {
-            let thumbH = (width * 9.0 / 16.0).rounded()
-            let textW = width - 12 - 36 - 10 - 12
-            let titleH = min(titleLabel.sizeThatFits(CGSize(width: textW, height: 52)).height, 40)
-            return CGSize(width: width, height: thumbH + 10 + titleH + 4 + 16 + 2 + 16 + 12)
-        }
-    }
-
-    // Called by UITableView when rowHeight = .automaticDimension.
-    // The cell uses manual layout so we delegate to sizeThatFits.
-    override func systemLayoutSizeFitting(
-        _ targetSize: CGSize,
-        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
-        verticalFittingPriority: UILayoutPriority
-    ) -> CGSize {
-        // On some iOS versions targetSize.width may be 0; fall back to the
-        // cell's actual width (set by the table view before this is called).
-        let width = targetSize.width > 10 ? targetSize.width : bounds.width
-        return sizeThatFits(CGSize(width: width, height: 0))
-    }
-
-    /// iPad / wide: thumbnail left, text right — matches original subscriptions style
-    private func layoutHorizontal(width: CGFloat) {
-        let height: CGFloat = 220
-        let vPad: CGFloat = 10
-        let hPad: CGFloat = 12
-        let thumbH: CGFloat = height - vPad * 2
-        let thumbW: CGFloat = (thumbH * 16.0 / 9.0).rounded()
-
-        thumbnail.frame = CGRect(x: hPad, y: vPad, width: thumbW, height: thumbH)
-
-        if !durationLabel.isHidden {
-            let dW = max(36, durationLabel.intrinsicContentSize.width + 8)
-            let dx = thumbnail.bounds.width - dW - 4
-            let dy = thumbnail.bounds.height - 22
-            durationLabel.frame = CGRect(x: dx, y: dy, width: dW, height: 18)
-        }
-
-        let avatarSz: CGFloat = 36
-        let textX = thumbnail.frame.maxX + hPad
-        let textW = width - textX - hPad
-
-        let titleH = min(titleLabel.sizeThatFits(CGSize(width: textW, height: 52)).height, 40)
-        titleLabel.frame = CGRect(x: textX, y: vPad, width: textW, height: titleH)
-
-        let afterTitle = titleLabel.frame.maxY + 8
-        channelAvatarView.isHidden = false
-        channelAvatarView.frame = CGRect(x: textX, y: afterTitle, width: avatarSz, height: avatarSz)
-        let labelX = textX + avatarSz + 10
-        let labelW = width - labelX - hPad
-        let chanY = afterTitle + (avatarSz - 15) / 2
-        channelLabel.frame = CGRect(x: labelX, y: chanY, width: labelW, height: 15)
-        let dateY = channelAvatarView.frame.maxY + 6
-        dateLabel.frame = CGRect(x: textX, y: dateY, width: textW, height: 15)
-    }
-
-    /// iPhone / slide-over / narrow: thumbnail full-width on top, text below
-    private func layoutVertical(width: CGFloat) {
-        let thumbH = (width * 9.0 / 16.0).rounded()
-        thumbnail.frame = CGRect(x: 0, y: 0, width: width, height: thumbH)
-
-        if !durationLabel.isHidden {
-            let dW = max(36, durationLabel.intrinsicContentSize.width + 8)
-            let dx = thumbnail.bounds.width - dW - 6
-            let dy = thumbnail.bounds.height - 24
-            durationLabel.frame = CGRect(x: dx, y: dy, width: dW, height: 18)
-        }
-
-        let avatarSz: CGFloat = 36
-        let hPad: CGFloat = 12
-        let avatarX: CGFloat = hPad
-        let textX = avatarX + avatarSz + 10
-        let textW = width - textX - hPad
-
-        channelAvatarView.isHidden = false
-        let avatarY = thumbH + 10
-        channelAvatarView.frame = CGRect(x: avatarX, y: avatarY, width: avatarSz, height: avatarSz)
-
-        let titleH = min(titleLabel.sizeThatFits(CGSize(width: textW, height: 52)).height, 40)
-        titleLabel.frame = CGRect(x: textX, y: thumbH + 10, width: textW, height: titleH)
-
-        let channelTop = titleLabel.frame.maxY + 4
-        channelLabel.frame = CGRect(x: textX, y: channelTop, width: textW, height: 16)
-        dateLabel.frame = CGRect(x: textX, y: channelLabel.frame.maxY + 2, width: textW, height: 16)
     }
 
     @objc
@@ -184,8 +105,11 @@ class SubscriptionVideoCell: UITableViewCell {
 
     func configureSkeleton() {
         hideSkeleton()
-        titleLabel.text = nil; channelLabel.text = nil; dateLabel.text = nil
-        thumbnail.image = nil; channelAvatarView.image = nil
+        titleLabel.text = nil
+        channelLabel.text = nil
+        dateLabel.text = nil
+        thumbnail.image = nil
+        channelAvatarView.image = nil
         durationLabel.isHidden = true
         contentView.showSkeleton()
     }
@@ -213,6 +137,7 @@ class SubscriptionVideoCell: UITableViewCell {
         if let url = URL(string: video.thumbnailURL) {
             thumbnail.setImage(url: url)
         }
+        applyWatchProgress(videoId: video.id)
         setNeedsLayout()
     }
 
@@ -227,6 +152,23 @@ class SubscriptionVideoCell: UITableViewCell {
         dateLabel.text = nil
         durationLabel.isHidden = true
         channelAvatarView.isHidden = false
+        watchFraction = 0
+        progressTrack.isHidden = true
+        progressFill.isHidden = true
         onChannelTap = nil
+    }
+
+    func applyWatchProgress(videoId: String) {
+        if let prog = WatchProgressStore.shared.progress(
+            forVideoId: videoId
+        ), prog.shouldShow {
+            watchFraction = CGFloat(prog.fraction)
+            progressTrack.isHidden = false
+            progressFill.isHidden = false
+        } else {
+            watchFraction = 0
+            progressTrack.isHidden = true
+            progressFill.isHidden = true
+        }
     }
 }

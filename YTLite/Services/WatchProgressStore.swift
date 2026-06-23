@@ -1,57 +1,32 @@
 import Foundation
 
 struct WatchProgress {
-    let position: TimeInterval
-    let duration: TimeInterval
-
-    var fraction: Double {
-        guard duration > 0 else {
-            return 0
-        }
-        return min(1.0, position / duration)
-    }
+    let fraction: Double
 
     var shouldShow: Bool {
-        fraction > 0.03 && fraction < 0.97
+        fraction > 0.03
     }
 }
 
-/// Persists per-video watch progress locally.
-/// Updated by WatchtimeTracker on every ping
-/// and by WatchProgressSyncService from server.
+/// Stores per-video watch progress from YouTube servers.
+/// Populated by WatchProgressSyncService and inline
+/// extraction from browse/feed responses.
 final class WatchProgressStore {
     static let shared = WatchProgressStore()
 
-    private let key = "WatchProgressStore.v1"
     private let fractionKey = "WatchProgressStore.fractions"
     private let maxEntries = 200
     private let queue = DispatchQueue(
         label: "com.ytvlite.watch-progress",
         attributes: .concurrent
     )
-    private var store: [String: [Double]] = [:]
     private var serverFractions: [String: Double] = [:]
 
     init() {
-        load()
         loadFractions()
-    }
-
-    func setProgress(
-        videoId: String,
-        position: TimeInterval,
-        duration: TimeInterval
-    ) {
-        queue.async(flags: .barrier) {
-            self.store[videoId] = [position, duration]
-            if self.store.count > self.maxEntries {
-                let excess = self.store.count - self.maxEntries
-                self.store.keys
-                    .prefix(excess)
-                    .forEach { self.store.removeValue(forKey: $0) }
-            }
-            self.persist()
-        }
+        UserDefaults.standard.removeObject(
+            forKey: "WatchProgressStore.v1"
+        )
     }
 
     func setFraction(
@@ -60,6 +35,16 @@ final class WatchProgressStore {
     ) {
         queue.async(flags: .barrier) {
             self.serverFractions[videoId] = fraction
+            if self.serverFractions.count > self.maxEntries {
+                let excess = self.serverFractions
+                    .count - self.maxEntries
+                self.serverFractions.keys
+                    .prefix(excess)
+                    .forEach {
+                        self.serverFractions
+                            .removeValue(forKey: $0)
+                    }
+            }
             self.persistFractions()
         }
     }
@@ -73,38 +58,18 @@ final class WatchProgressStore {
         }
     }
 
-    func progress(forVideoId videoId: String) -> WatchProgress? {
-        let entry = queue.sync { store[videoId] }
-        if let entry, entry.count == 2 {
-            return WatchProgress(
-                position: entry[0], duration: entry[1]
-            )
-        }
-        if let frac = queue.sync(execute: {
+    func progress(
+        forVideoId videoId: String
+    ) -> WatchProgress? {
+        guard let frac = queue.sync(execute: {
             serverFractions[videoId]
-        }) {
-            return WatchProgress(
-                position: frac, duration: 1.0
-            )
+        }) else {
+            return nil
         }
-        return nil
+        return WatchProgress(fraction: frac)
     }
 
     // MARK: - Persistence
-
-    private func load() {
-        guard let raw = UserDefaults.standard.dictionary(
-            forKey: key
-        ) as? [String: [Double]]
-        else {
-            return
-        }
-        store = raw
-    }
-
-    private func persist() {
-        UserDefaults.standard.set(store, forKey: key)
-    }
 
     private func loadFractions() {
         guard let raw = UserDefaults.standard.dictionary(
