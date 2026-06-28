@@ -9,11 +9,12 @@ extension WatchViewController: UICollectionViewDataSource {
     ) {
         cell.onChannelTap = { [weak self] in
             guard let self,
-                  let channelId = video.channelId else {
+                  let channelId = video.channelId
+            else {
                 return
             }
-            self.navigationController?.pushViewController(
-                self.channelViewControllerFactory(
+            navigationController?.pushViewController(
+                channelViewControllerFactory(
                     channelId,
                     video.channelName
                 ),
@@ -22,35 +23,85 @@ extension WatchViewController: UICollectionViewDataSource {
         }
     }
 
+    func numberOfSections(
+        in collectionView: UICollectionView
+    )
+        -> Int {
+        isPlaylistMode ? 2 : 1
+    }
+
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
-    ) -> Int {
-        visibleRelatedVideos.count
+    )
+        -> Int {
+        if isPlaylistMode {
+            return section == 0
+                ? max(0, queue.videos.count - 1)
+                : visibleRelatedVideos.count
+        }
+        return visibleRelatedVideos.count
     }
 
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    )
+        -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: VideoCell.reuseId,
             for: indexPath
         ) as? VideoCell else {
             return UICollectionViewCell()
         }
-        guard visibleRelatedVideos.indices.contains(
-            indexPath.item
-        ) else {
+        let video: Video? = if isPlaylistMode {
+            indexPath.section == 0
+                ? queue.videos[safe: indexPath.item + 1]
+                : visibleRelatedVideos[safe: indexPath.item]
+        } else {
+            visibleRelatedVideos[safe: indexPath.item]
+        }
+        guard let video else {
             return cell
         }
-        let video = visibleRelatedVideos[indexPath.item]
         let isLandscape =
             view.bounds.width > view.bounds.height
         cell.forceGridLayout = !isLandscape
         cell.configure(with: video)
         configureChannelNavigation(for: cell, video: video)
         return cell
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    )
+        -> UICollectionReusableView {
+        guard isPlaylistMode,
+              kind == UICollectionView
+              .elementKindSectionHeader
+        else {
+            return UICollectionReusableView()
+        }
+        let header = collectionView
+            .dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier:
+                PlaylistSectionHeaderView.reuseIdentifier,
+                for: indexPath
+            ) as? PlaylistSectionHeaderView
+            ?? PlaylistSectionHeaderView()
+        let title: String = if indexPath.section == 0 {
+            queue.playlistTitle ?? "Mix"
+        } else {
+            "Related"
+        }
+        header.configure(
+            title: title,
+            color: ThemeManager.shared.primaryText
+        )
+        return header
     }
 }
 
@@ -60,7 +111,8 @@ extension WatchViewController: UICollectionViewDelegate {
     func collectionView(
         _ collectionView: UICollectionView,
         shouldSelectItemAt indexPath: IndexPath
-    ) -> Bool {
+    )
+        -> Bool {
         !isOuterScrollViewDragging
             && !scrollView.isDecelerating
     }
@@ -69,13 +121,36 @@ extension WatchViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        guard visibleRelatedVideos.indices.contains(
-            indexPath.item
-        ) else {
+        let video: Video? = if isPlaylistMode {
+            indexPath.section == 0
+                ? queue.videos[safe: indexPath.item + 1]
+                : visibleRelatedVideos[safe: indexPath.item]
+        } else {
+            visibleRelatedVideos[safe: indexPath.item]
+        }
+        guard let video else {
             return
         }
-        let video = visibleRelatedVideos[indexPath.item]
         navigateTo(video)
+    }
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+
+extension WatchViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    )
+        -> CGSize {
+        guard isPlaylistMode else {
+            return .zero
+        }
+        return CGSize(
+            width: collectionView.bounds.width,
+            height: 32
+        )
     }
 }
 
@@ -123,7 +198,8 @@ extension WatchViewController: UIScrollViewDelegate {
             + scrollView.bounds.height
         let contentHeight = scrollView.contentSize.height
         guard contentHeight > 0,
-              offset >= contentHeight - threshold else {
+              offset >= contentHeight - threshold
+        else {
             return
         }
         expandRelatedIfNeeded()
@@ -153,5 +229,13 @@ extension WatchViewController: PlaybackContext {
         videoPlayerView?.onCCTapped = { [weak self] in
             self?.showSubtitlePicker()
         }
+    }
+}
+
+// MARK: - Safe Collection Subscript
+
+private extension Collection {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }

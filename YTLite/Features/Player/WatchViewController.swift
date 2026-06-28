@@ -71,6 +71,7 @@ final class WatchViewController: UIViewController {
     var isRecoveringPlayback = false
     var hasSeenPlaybackError = false
     var recoveryTargetSeconds: Double?
+    let queue = PlaybackQueue.shared
 
     // MARK: - UI Elements
 
@@ -156,6 +157,10 @@ final class WatchViewController: UIViewController {
 
     override var prefersHomeIndicatorAutoHidden: Bool {
         isLandscapeFullscreen
+    }
+
+    var isPlaylistMode: Bool {
+        queue.playlistTitle != nil
     }
 
     // MARK: - Initializers

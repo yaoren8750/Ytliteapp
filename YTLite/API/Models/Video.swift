@@ -17,6 +17,7 @@ struct Video: Codable {
     let publishedAt: String?
     let duration: String?
     let isLive: Bool
+    let playlistId: String?
 
     init(
         id: String,
@@ -28,7 +29,8 @@ struct Video: Codable {
         viewCount: String?,
         publishedAt: String?,
         duration: String?,
-        isLive: Bool = false
+        isLive: Bool = false,
+        playlistId: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -40,6 +42,7 @@ struct Video: Codable {
         self.publishedAt = publishedAt
         self.duration = duration
         self.isLive = isLive
+        self.playlistId = playlistId
     }
 
     init(from decoder: Decoder) throws {
@@ -58,6 +61,7 @@ struct Video: Codable {
         )
         duration = try container.decodeIfPresent(String.self, forKey: .duration)
         isLive = try container.decodeIfPresent(Bool.self, forKey: .isLive) ?? false
+        playlistId = try container.decodeIfPresent(String.self, forKey: .playlistId)
     }
 }
 
@@ -90,6 +94,8 @@ struct WatchPage {
     let likeCount: String?
     let likeStatus: LikeStatus?
     let nextVideo: Video?
+    let playlistTitle: String?
+    let playlistVideos: [Video]?
 }
 
 struct DashFormatInfo {

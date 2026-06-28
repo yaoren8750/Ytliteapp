@@ -82,7 +82,8 @@ extension InnertubeClient {
                 viewCount: fallbackVideo.viewCount,
                 publishedAt: fallbackVideo.publishedAt,
                 duration: fallbackVideo.duration,
-                isLive: fallbackVideo.isLive
+                isLive: fallbackVideo.isLive,
+                playlistId: fallbackVideo.playlistId
             )
         }
         return buildFallbackChannel(fallbackVideo: enriched)
@@ -95,7 +96,8 @@ extension InnertubeClient {
         for name in [
             "slimOwnerRenderer",
             "videoOwnerRenderer",
-            "ownerRenderer"
+            "ownerRenderer",
+            "channelThumbnailWithLinkRenderer"
         ] {
             guard let owner = firstRenderer(
                 in: json, named: name

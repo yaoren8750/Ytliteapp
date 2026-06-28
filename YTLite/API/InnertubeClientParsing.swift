@@ -10,6 +10,7 @@ extension InnertubeClient {
         )
         let sub = parseSubscribeState(json)
         let likeInfo = parseWatchLikeInfo(json)
+        let pivot = parsePivotPlaylist(json: json)
         return WatchPage(
             video: resolvedVideo(
                 fb, from: json, channel: ch
@@ -23,7 +24,9 @@ extension InnertubeClient {
             ),
             likeCount: likeInfo.likeCount,
             likeStatus: likeInfo.likeStatus,
-            nextVideo: autoplayNextVideo(json)
+            nextVideo: autoplayNextVideo(json),
+            playlistTitle: pivot?.title,
+            playlistVideos: pivot?.videos
         )
     }
 
@@ -116,7 +119,8 @@ private extension InnertubeClient {
             publishedAt: meta.publishedText
                 ?? fb.publishedAt,
             duration: fb.duration,
-            isLive: fb.isLive
+            isLive: fb.isLive,
+            playlistId: fb.playlistId
         )
     }
 

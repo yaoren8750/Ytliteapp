@@ -6,7 +6,8 @@ extension InnertubeClient {
         videoId: String,
         title: String,
         tile: [String: Any],
-        meta: [String: Any]?
+        meta: [String: Any]?,
+        playlistId: String? = nil
     ) -> Video {
         let lines = meta?["lines"] as? [[String: Any]] ?? []
         let channel = extractTileChannel(from: lines)
@@ -30,7 +31,8 @@ extension InnertubeClient {
             viewCount: timing.viewCount,
             publishedAt: timing.publishedAt,
             duration: overlay.duration,
-            isLive: overlay.isLive
+            isLive: overlay.isLive,
+            playlistId: playlistId
         )
     }
 

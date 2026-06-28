@@ -65,11 +65,17 @@ extension InnertubeClient {
         let title = simpleText(
             from: meta?[JSONKey.title]
         ) ?? ""
+        let playlistId = tile.digString(
+            "onSelectCommand",
+            "watchEndpoint",
+            "playlistId"
+        )
         return buildTileVideo(
             videoId: videoId,
             title: title,
             tile: tile,
-            meta: meta
+            meta: meta,
+            playlistId: playlistId
         )
     }
 

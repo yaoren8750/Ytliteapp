@@ -5,15 +5,15 @@ import UIKit
 
 private func formatVoteCount(_ count: Int) -> String {
     switch count {
-    case 0..<1_000:
-        return "\(count)"
-    case 1_000..<1_000_000:
-        return String(
+    case 0 ..< 1_000:
+        "\(count)"
+    case 1_000 ..< 1_000_000:
+        String(
             format: "%.1fK",
             Double(count) / 1_000
         )
     default:
-        return String(
+        String(
             format: "%.1fM",
             Double(count) / 1_000_000
         )
@@ -57,19 +57,21 @@ extension WatchViewController {
             channelId: channelId
         ) { [weak self] result in
             guard let self,
-                  case .success(let info) = result,
+                  case let .success(info) = result,
                   let avatarStr = info.avatarURL,
-                  let url = URL(string: avatarStr) else {
+                  let url = URL(string: avatarStr)
+            else {
                 return
             }
-            self.channelAvatarView.setImage(url: url)
+            channelAvatarView.setImage(url: url)
         }
     }
 
     func buildMetaText(
         viewCount: String?,
         publishedAt: String?
-    ) -> String {
+    )
+        -> String {
         [
             viewCount,
             publishedAt.map(
@@ -92,13 +94,13 @@ extension WatchViewController {
         ) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let page):
+                case let .success(page):
                     self?.applyWatchPage(page)
-                case .failure(let error):
+                case let .failure(error):
                     AppLog.player(
                         "watch page load failed "
-                        + "\(self?.initialVideo.id ?? "nil")"
-                        + ": \(error)"
+                            + "\(self?.initialVideo.id ?? "nil")"
+                            + ": \(error)"
                     )
                 }
             }
@@ -128,7 +130,7 @@ extension WatchViewController {
         prefetchNextVideoPoToken(page)
     }
 
-    // Warm up PoToken for autoplay next video while current is playing
+    /// Warm up PoToken for autoplay next video while current is playing
     private func prefetchNextVideoPoToken(_ page: WatchPage) {
         guard let nextId = page.nextVideo?.id else {
             return
@@ -139,27 +141,28 @@ extension WatchViewController {
     }
 
     func applyChannelInfo(from page: WatchPage) {
-        guard let channelInfo = page.channelInfo else {
-            let chId = page.video.channelId ?? "nil"
-            AppLog.channel(
-                "applyChannelInfo: no channelInfo,"
-                + " videoChannelId=\(chId)"
-            )
-            if let chId = page.video.channelId {
+        if let channelInfo = page.channelInfo {
+            channelNameLabel.text = channelInfo.title.isEmpty
+                ? initialVideo.channelName
+                : channelInfo.title
+            channelMetaLabel.text = channelInfo.subscriberCountText
+            if let avatarStr = channelInfo.avatarURL,
+               let url = URL(string: avatarStr) {
+                channelAvatarView.setImage(url: url)
+            } else if let chId = page.video.channelId {
                 fetchChannelAvatar(channelId: chId)
             }
             return
         }
-        channelNameLabel.text = channelInfo.title.isEmpty
+        let name = page.video.channelName.isEmpty
             ? initialVideo.channelName
-            : channelInfo.title
-        channelMetaLabel.text = channelInfo.subscriberCountText
-        if let avatarStr = channelInfo.avatarURL,
-           let url = URL(string: avatarStr) {
-            channelAvatarView.setImage(url: url)
-        } else if let chId = page.video.channelId {
-            AppLog.channel("applyChannelInfo: avatarURL nil, fetching for \(chId)")
+            : page.video.channelName
+        channelNameLabel.text = name
+        channelMetaLabel.text = nil
+        if let chId = page.video.channelId {
             fetchChannelAvatar(channelId: chId)
+        } else {
+            channelAvatarView.cancel()
         }
     }
 
@@ -206,10 +209,11 @@ extension WatchViewController {
             DispatchQueue.main.async {
                 guard let self,
                       self.watchPage?.video.id
-                        == videoId else {
+                      == videoId
+                else {
                     return
                 }
-                if case .success(let votes) = result {
+                if case let .success(votes) = result {
                     self.likeCountLabel.text =
                         formatVoteCount(votes.likes)
                     self.dislikeCountLabel.text =
@@ -226,10 +230,11 @@ extension WatchViewController {
             DispatchQueue.main.async {
                 guard let self,
                       self.watchPage?.video.id
-                        == videoId else {
+                      == videoId
+                else {
                     return
                 }
-                if case .success(let segments) = result {
+                if case let .success(segments) = result {
                     self.sponsorBlock.segments = segments
                     self.videoPlayerView?
                         .setSponsorSegments(segments)
@@ -249,21 +254,42 @@ extension WatchViewController {
         visibleRelatedVideos = Array(
             related.prefix(relatedBatchSize)
         )
+        populateQueueIfNeeded(from: page)
         relatedCollectionView.reloadData()
         channelInfoStore.preload(
             channelIds: related.compactMap(\.channelId)
         )
     }
 
+    private func populateQueueIfNeeded(
+        from page: WatchPage
+    ) {
+        if queue.videos.contains(
+            where: { $0.id == page.video.id }
+        ) {
+            queue.seekTo(videoId: page.video.id)
+        } else if let vids = page.playlistVideos,
+                  !vids.isEmpty {
+            queue.setQueue(
+                vids,
+                title: page.playlistTitle
+            )
+            queue.seekTo(videoId: page.video.id)
+        } else {
+            queue.clear()
+        }
+    }
+
     private func enrichWithChannelId(
         _ video: Video,
         from pool: [Video]
-    ) -> Video {
+    )
+        -> Video {
         guard video.channelId == nil
         else { return video }
         let match = pool.first {
             $0.channelId != nil
-            && $0.channelName == video.channelName
+                && $0.channelName == video.channelName
         }
         guard let chId = match?.channelId
         else { return video }

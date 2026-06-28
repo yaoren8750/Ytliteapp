@@ -199,13 +199,22 @@ extension WatchViewController {
     func playerItemDidPlayToEnd(
         _ notification: Notification
     ) {
-        guard let nextVideo =
-            watchPage?.nextVideo
-        else {
-            return
-        }
-        DispatchQueue.main.async { [weak self] in
-            self?.showAutoplayOverlay(for: nextVideo)
+        if queue.hasNext {
+            guard let next = queue.advanceToNext() else {
+                return
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.navigateTo(next)
+            }
+        } else {
+            guard let nextVideo =
+                watchPage?.nextVideo
+            else {
+                return
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.showAutoplayOverlay(for: nextVideo)
+            }
         }
     }
 

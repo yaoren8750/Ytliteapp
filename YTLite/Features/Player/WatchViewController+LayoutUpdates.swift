@@ -94,19 +94,19 @@ extension WatchViewController {
         layout: UICollectionViewFlowLayout,
         isLandscape: Bool,
         containerSize: CGSize?
-    ) -> CGSize {
+    )
+        -> CGSize {
         let cols: CGFloat = isLandscape ? 1 : 2
         let inset = layout.sectionInset.left
             + layout.sectionInset.right
         let spacing = layout.minimumInteritemSpacing
             * (cols - 1)
-        let baseWidth: CGFloat
-        if let containerSize {
-            baseWidth = isLandscape
+        let baseWidth: CGFloat = if let containerSize {
+            isLandscape
                 ? (sidebarWidthConstraint?.constant ?? 0)
                 : containerSize.width
         } else {
-            baseWidth = relatedCollectionView.bounds.width
+            relatedCollectionView.bounds.width
         }
         let available = max(baseWidth - inset - spacing, 120)
         let itemWidth = floor(available / cols)
@@ -119,13 +119,29 @@ extension WatchViewController {
         isLandscape: Bool,
         itemHeight: CGFloat
     ) {
-        let count = CGFloat(visibleRelatedVideos.count)
         let cols: CGFloat = isLandscape ? 1 : 2
-        let rows = count == 0 ? 0 : ceil(count / cols)
         let si = layout.sectionInset
-        let total = rows == 0 ? 0 : si.top + si.bottom
-            + rows * itemHeight
-            + max(0, rows - 1) * layout.minimumLineSpacing
+        let headerHeight: CGFloat = isPlaylistMode ? 32 : 0
+        let playlistCount = CGFloat(
+            isPlaylistMode ? queue.videos.count : 0
+        )
+        let relatedCount = CGFloat(
+            visibleRelatedVideos.count
+        )
+        func sectionHeight(_ count: CGFloat) -> CGFloat {
+            let rows = count == 0 ? 0 : ceil(count / cols)
+            return rows == 0 ? 0 : si.top + si.bottom
+                + rows * itemHeight
+                + max(0, rows - 1)
+                * layout.minimumLineSpacing
+        }
+        let playlistHeight = sectionHeight(playlistCount)
+        let relatedHeight = sectionHeight(relatedCount)
+        let totalSections = isPlaylistMode ? 2 : 1
+        let totalHeaders = CGFloat(totalSections - 1)
+            * headerHeight
+        let total = playlistHeight
+            + relatedHeight + totalHeaders
         let desired = isLandscape ? 0 : total
         if relatedHeightConstraint?.constant != desired {
             relatedHeightConstraint?.constant = desired

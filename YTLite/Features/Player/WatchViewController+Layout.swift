@@ -33,6 +33,7 @@ extension WatchViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         updateLeftBarButton()
     }
+
     func addNotificationObservers() {
         let nc = NotificationCenter.default
         let tn = ThemeManager.didChangeNotification
@@ -53,6 +54,7 @@ extension WatchViewController {
             )
         }
     }
+
     func setupLayout() {
         setupScrollAndPlayer()
         setupPlayerOverlays()
@@ -68,9 +70,10 @@ extension WatchViewController {
         channelAvatarView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: sel))
         channelNameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: sel))
     }
+
     func setupScrollAndPlayer() {
-        [scrollView, playerContainer, sidebarContainer, contentView].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
+        for item in [scrollView, playerContainer, sidebarContainer, contentView] {
+            item.translatesAutoresizingMaskIntoConstraints = false
         }
         scrollView.alwaysBounceVertical = true
         scrollView.delaysContentTouches = false
@@ -102,6 +105,7 @@ extension WatchViewController {
         sidebarWidthConstraint = sc.widthAnchor.constraint(equalToConstant: 340)
         activateScrollConstraints()
     }
+
     func activateScrollConstraints() {
         let cv = contentView, sv = scrollView
         let cl = sv.contentLayoutGuide, fl = sv.frameLayoutGuide
@@ -122,6 +126,7 @@ extension WatchViewController {
             ].compactMap { $0 }
         )
     }
+
     func setupPlayerOverlays() {
         let ps = playerSpinner, sl = playerStatusLabel, pc = playerContainer
         [ps, sl].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
@@ -140,10 +145,11 @@ extension WatchViewController {
             sl.trailingAnchor.constraint(equalTo: pc.trailingAnchor, constant: -24)
         ])
     }
+
     func setupMetaViews() {
         let cv = contentView
-        [titleLabel, metaLabel, descriptionLabel, descriptionButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
+        for item in [titleLabel, metaLabel, descriptionLabel, descriptionButton] {
+            item.translatesAutoresizingMaskIntoConstraints = false
         }
         titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         titleLabel.numberOfLines = 0
@@ -160,10 +166,11 @@ extension WatchViewController {
         descriptionButton.setTitle("More", for: .normal)
         cv.addSubview(descriptionButton)
     }
+
     func setupChannelViews() {
         let cv = contentView
-        [channelAvatarView, channelNameLabel, channelMetaLabel, subscribeButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
+        for item in [channelAvatarView, channelNameLabel, channelMetaLabel, subscribeButton] {
+            item.translatesAutoresizingMaskIntoConstraints = false
         }
         channelAvatarView.layer.cornerRadius = 22
         channelAvatarView.layer.masksToBounds = true
@@ -183,6 +190,7 @@ extension WatchViewController {
         subscribeButton.addTarget(self, action: sel, for: .touchUpInside)
         cv.addSubview(subscribeButton)
     }
+
     func setupActionBar() {
         actionBar.axis = .horizontal
         actionBar.distribution = .fillEqually
@@ -224,12 +232,14 @@ extension WatchViewController {
             )
         }
     }
+
     func makeActionItem(
         btn: UIButton,
         iconName: String,
         staticLabel: String?,
         countLabel: UILabel? = nil
-    ) -> UIStackView {
+    )
+        -> UIStackView {
         if let img = UIImage(named: iconName) {
             let sz = CGSize(width: 22, height: 22)
             let rendered = UIGraphicsImageRenderer(size: sz).image { _ in
@@ -253,10 +263,11 @@ extension WatchViewController {
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }
+
     func setupCommentsSection() {
         let cv = contentView
-        [commentsLabel, commentsStackView, loadMoreCommentsButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
+        for item in [commentsLabel, commentsStackView, loadMoreCommentsButton] {
+            item.translatesAutoresizingMaskIntoConstraints = false
         }
         commentsLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         commentsLabel.text = "Comments"
@@ -274,9 +285,17 @@ extension WatchViewController {
         )
         cv.addSubview(loadMoreCommentsButton)
     }
+
     func setupRelatedCollection() {
         let rv = relatedCollectionView
         rv.register(VideoCell.self, forCellWithReuseIdentifier: VideoCell.reuseId)
+        rv.register(
+            PlaylistSectionHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView
+                .elementKindSectionHeader,
+            withReuseIdentifier:
+            PlaylistSectionHeaderView.reuseIdentifier
+        )
         rv.dataSource = self
         rv.delegate = self
         rv.translatesAutoresizingMaskIntoConstraints = false
@@ -296,7 +315,8 @@ extension WatchViewController {
     /// compensate via `additionalSafeAreaInsets` so Auto Layout still works.
     func adjustForFloatingNavBar() {
         guard let navBar = navigationController?.navigationBar,
-              !navBar.isHidden else {
+              !navBar.isHidden
+        else {
             if additionalSafeAreaInsets.top != 0 {
                 additionalSafeAreaInsets.top = 0
             }
@@ -315,6 +335,7 @@ extension WatchViewController {
 }
 
 // MARK: - iPhone landscape rotation → auto-fullscreen
+
 extension WatchViewController {
     @objc
     func handleDeviceOrientationChange() {

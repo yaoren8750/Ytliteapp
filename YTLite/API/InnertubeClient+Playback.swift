@@ -11,6 +11,10 @@ extension InnertubeClient {
     ) {
         var body = anonymous ? webContext : tvContext
         body["videoId"] = video.id
+        if let pid = video.playlistId {
+            body["playlistId"] = pid
+            body["params"] = "OALAAQE%3D"
+        }
         var headers = anonHeaders()
         if !anonymous && !token.isEmpty {
             headers[HTTPHeader.authorization] = "Bearer \(token)"
