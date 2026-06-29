@@ -1,0 +1,4 @@
+// Local build configuration template
+// Copy this file to Local.xcconfig and fill in your values.
+
+PRODUCT_BUNDLE_IDENTIFIER = com.example.YourApp

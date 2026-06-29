@@ -14,6 +14,9 @@ YTVLite.xcodeproj
 # macOS
 .DS_Store
 
+# Local build config
+Config/Local.xcconfig
+
 # AI/Agent configs
 .claude/
 CLAUDE.md

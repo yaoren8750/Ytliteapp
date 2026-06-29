@@ -1,53 +1,87 @@
 # YTLite
 
-A lightweight, privacy-focused YouTube client for iOS 12+ built entirely with UIKit. No ads, no tracking, no dependencies.
+A lightweight YouTube client for iOS 12+ built entirely with UIKit. No ads, no tracking, no dependencies.
+
+> **Note:** This project is not related to [dayanch96/YTLite](https://github.com/dayanch96/YTLite) (YouTube Plus). The name collision is accidental.
 
 <p align="center">
   <img src="screenshots/channel.jpeg" width="300" alt="Channel page">
 </p>
+
+## Why
+
+When Google dropped support for the official YouTube app on older devices, there was no way to watch videos properly. Browsers capped quality at 360p — and even that barely ran. YTLite was born to restore what was lost: high-quality playback on hardware that still works fine, just ignored by Google. The "Lite" stands for a focused, lightweight client that does one thing well — let you watch YouTube.
 
 ## Features
 
 - **Video Playback** — up to 1080p 60fps quality
 - **Background Audio** — Continue listening with the screen off
 - **Picture-in-Picture** — Watch while using other apps
-- **SponsorBlock** — Skip sponsored segments automatically 
+- **SponsorBlock** — Skip sponsored segments automatically
 - **Return YouTube Dislike** — See dislike counts again
 - **Subtitles** — Full subtitle/caption support with VTT parsing
 - **Search & Browse** — Home feed, trending, channel pages, playlists
 - **Subscriptions** — Follow channels with a local subscription feed
-- **Watch History** — Track what you've watched with progress indicators
+- **Watch History** — Track what you've watched with progress indicators, synced across devices
 - **Autoplay** — Automatically play the next related video
 - **Dark/Light Theme** — Manual theme switching via ThemeManager
-- **Download** — Save videos for offline viewing (planned)
 
 <p align="center">
   <img src="screenshots/settings.PNG" width="300" alt="Settings">
 </p>
 
-## Requirements
+## How to Use
 
-- iOS 12.0+
-- Xcode 16+
-- No external dependencies (no CocoaPods, no SPM packages)
+YTLite runs on devices with **iOS 12 and above**.
+
+### Jailbroken devices
+
+Install the `.ipa` package directly:
+- **Filza** — open the `.ipa` file → Install
+- **ReProvision** — sign and install the IPA from the app
+
+### Non-jailbroken devices
+
+Sideload the `.ipa` via **AltStore** or **SideStore**.
+
+To build the IPA yourself:
+
+```bash
+./make_ipa.sh
+```
+
+## Known Issues and Limitations
+
+- Kids content is not available — the current API source does not return it; may be added later
+- Audio track selection is not possible (same API limitation)
+- Playback speeds above 2x may cause issues
+- **Shorts** are not natively supported — they are treated as regular videos, but can be hidden from the subscriptions feed
+- Comments are displayed as a flat read-only list
+- Offline download is not yet available
+
+## Bug Reports
+
+If you encounter a bug, you can export debug logs directly from the app:
+
+**Settings → Debug → Share Debug Log**
+
+This generates a log file you can attach to your GitHub issue. The log includes timestamped playback, API, and caching events that help diagnose problems.
+
+<details>
+<summary>For developers</summary>
 
 ## Building
 
 ```bash
 git clone https://github.com/verback2308/YTLite.git
 cd YTLite
+cp Config/Local.xcconfig.example Config/Local.xcconfig
 open YTLite.xcodeproj
 ```
 
+Edit `Config/Local.xcconfig` and set your own `PRODUCT_BUNDLE_IDENTIFIER`.
+
 Select the **YTVLite** scheme, choose your device or simulator, and build (⌘B).
-
-### IPA for sideloading
-
-```bash
-./make_ipa.sh
-```
-
-Produces a self-signed IPA installable via AltStore, TrollStore, or Filza (jailbroken).
 
 ## Architecture
 
@@ -112,19 +146,14 @@ OAuth device-code flow: the app requests a device code → user enters it at goo
 
 Please follow the existing code style. SwiftLint is configured and runs as a build phase.
 
-## Bug Reports
-
-If you encounter a bug, you can export debug logs directly from the app:
-
-**Settings → Debug → Share Debug Log**
-
-This generates a log file you can attach to your GitHub issue. The log includes timestamped playback, API, and caching events that help diagnose problems.
+</details>
 
 ## Credits
 
 - [SponsorBlock](https://github.com/ajayyy/SponsorBlock) — crowdsourced API for skipping sponsored segments
 - [Return YouTube Dislike](https://github.com/Anarios/return-youtube-dislike) — community-maintained dislike count data
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp) — invaluable reference for understanding YouTube's playback infrastructure
+- [YouTubeLegacy](https://github.com/PoomSmart/YouTubeLegacy) — inspiration for keeping YouTube alive on older devices
 
 ## Legal
 
