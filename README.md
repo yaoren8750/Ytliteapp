@@ -2,7 +2,7 @@
 
 A lightweight YouTube client for iOS 12+ built entirely with UIKit. No ads, no tracking, no dependencies.
 
-> **Note:** This project is not related to [dayanch96/YTLite](https://github.com/dayanch96/YTLite) (YouTube Plus). The name collision is accidental.
+<a href="https://buymeacoffee.com/verback2308" target="_blank" rel="noopener noreferrer"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy me a coffee" height="50"></a>
 
 <p align="center">
   <img src="screenshots/channel.jpeg" width="300" alt="Channel page">
@@ -11,6 +11,8 @@ A lightweight YouTube client for iOS 12+ built entirely with UIKit. No ads, no t
 ## Why
 
 When Google dropped support for the official YouTube app on older devices, there was no way to watch videos properly. Browsers capped quality at 360p — and even that barely ran. YTLite was born to restore what was lost: high-quality playback on hardware that still works fine, just ignored by Google. The "Lite" stands for a focused, lightweight client that does one thing well — let you watch YouTube.
+
+> **Note:** This project is not related to [dayanch96/YTLite](https://github.com/dayanch96/YTLite) (YouTube Plus). The name collision is accidental.
 
 ## Features
 
