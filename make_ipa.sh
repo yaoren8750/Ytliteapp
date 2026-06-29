@@ -9,6 +9,7 @@ APP_NAME="YTLite"
 PROJECT="YTLite.xcodeproj"
 SCHEME="YTVLite"
 RELEASE_BUNDLE_ID="com.verback.YTLite"
+SOURCE_JSON="source/apps.json"
 
 echo "▶ Building Release for device..."
 xcodebuild \
@@ -53,6 +54,41 @@ mkdir "$TMP/Payload"
 cp -r "$APP_PATH" "$TMP/Payload/"
 (cd "$TMP" && zip -qr "$OLDPWD/$OUTPUT" Payload)
 rm -rf "$TMP"
+
+IPA_SIZE=$(stat -f%z "$OUTPUT" 2>/dev/null || stat -c%s "$OUTPUT" 2>/dev/null)
+DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+REPO_URL="https://github.com/verback2308/YTLite"
+DOWNLOAD_URL="$REPO_URL/releases/download/${VERSION}_${BUILD}/${OUTPUT}"
+
+echo "▶ Updating source: $SOURCE_JSON"
+python3 -c "
+import json, sys
+
+with open('$SOURCE_JSON', 'r') as f:
+    data = json.load(f)
+
+app = data['apps'][0]
+app['version'] = '$VERSION'
+app['versionDate'] = '$DATE'
+app['versionDescription'] = 'See release notes on GitHub'
+app['downloadURL'] = '$DOWNLOAD_URL'
+app['size'] = $IPA_SIZE
+
+app['versions'] = [{
+    'version': '$VERSION',
+    'date': '$DATE',
+    'localizedDescription': 'See release notes on GitHub',
+    'downloadURL': '$DOWNLOAD_URL',
+    'size': $IPA_SIZE,
+    'minOSVersion': '12.0'
+}]
+
+with open('$SOURCE_JSON', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+    f.write('\n')
+
+print(f'  Updated: {app[\"name\"]} v{app[\"version\"]}')
+"
 
 SIZE=$(du -sh "$OUTPUT" | cut -f1)
 echo "✅ $OUTPUT ($SIZE) — ready to share"

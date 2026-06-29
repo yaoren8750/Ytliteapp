@@ -1,0 +1,35 @@
+{
+  "name": "YTLite",
+  "identifier": "com.verback.ytlite-source",
+  "subtitle": "Lightweight YouTube client for iOS 12+",
+  "description": "A lightweight YouTube client with SponsorBlock, Return YouTube Dislike, and up to 1080p playback. No ads, no tracking, no dependencies.",
+  "website": "https://github.com/verback2308/YTLite",
+  "apps": [
+    {
+      "name": "YTLite",
+      "bundleIdentifier": "com.verback.YTLite",
+      "developerName": "verback",
+      "subtitle": "YouTube client for iOS 12+",
+      "versions": [
+        {
+          "version": "1.2.0",
+          "date": "2026-06-29T11:27:24Z",
+          "localizedDescription": "See release notes on GitHub",
+          "downloadURL": "https://github.com/verback2308/YTLite/releases/download/1.2.0_124/YTLite_1.2.0_124.ipa",
+          "size": 4273559,
+          "minOSVersion": "12.0"
+        }
+      ],
+      "version": "1.2.0",
+      "versionDate": "2026-06-29T11:27:24Z",
+      "versionDescription": "See release notes on GitHub",
+      "downloadURL": "https://github.com/verback2308/YTLite/releases/download/1.2.0_124/YTLite_1.2.0_124.ipa",
+      "localizedDescription": "A lightweight YouTube client for iOS 12+. No ads, no tracking. Features: SponsorBlock, Return YouTube Dislike, 1080p playback, background audio, PiP, subtitles, and more.",
+      "iconURL": "https://raw.githubusercontent.com/verback2308/YTLite/main/source/icon.png",
+      "tintColor": "FF0000",
+      "size": 4273559,
+      "category": "entertainment",
+      "minOSVersion": "12.0"
+    }
+  ]
+}
