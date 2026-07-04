@@ -116,92 +116,6 @@ extension WatchViewController: VideoPlayerViewDelegate {
         updateLayoutForSize()
     }
 
-    func showQualityPicker() {
-        guard let info = playbackFacade.activePlaybackInfo,
-              let audioFormat = info.dashAudioFormat else {
-            return
-        }
-        let formats = info.allDashVideoFormats
-        guard !formats.isEmpty else {
-            return
-        }
-        let alert = UIAlertController(
-            title: "Quality",
-            message: nil,
-            preferredStyle: .actionSheet
-        )
-        for format in formats {
-            addQualityAction(
-                to: alert,
-                format: format,
-                audioFormat: audioFormat
-            )
-        }
-        alert.addAction(
-            UIAlertAction(title: "Cancel", style: .cancel)
-        )
-        configurePopover(
-            for: alert,
-            sourceView: videoPlayerView
-        )
-        present(alert, animated: true)
-    }
-
-    func addQualityAction(
-        to alert: UIAlertController,
-        format: DashFormatInfo,
-        audioFormat: DashFormatInfo
-    ) {
-        let label = qualityLabel(for: format)
-        let active = playbackFacade.activeVideoFormat
-        let isCurrent = format.itag == active?.itag
-        let title = isCurrent ? "✓ \(label)" : label
-        alert.addAction(
-            UIAlertAction(
-                title: title,
-                style: .default
-            ) { [weak self] _ in
-                self?.switchQuality(
-                    to: format,
-                    audioFormat: audioFormat,
-                    label: label
-                )
-            }
-        )
-    }
-
-    func switchQuality(
-        to format: DashFormatInfo,
-        audioFormat: DashFormatInfo,
-        label: String
-    ) {
-        let active = playbackFacade.activeVideoFormat
-        guard format.itag != active?.itag else {
-            return
-        }
-        let client = playbackFacade.activePlaybackClient
-        let videoURL = prepareDirectPlaybackURL(
-            baseURL: format.url,
-            client: client,
-            poToken: nil
-        )
-        let audioURL = prepareDirectPlaybackURL(
-            baseURL: audioFormat.url,
-            client: client,
-            poToken: nil
-        )
-        playerStatusLabel.text = "Loading \(label)..."
-        playerStatusLabel.isHidden = false
-        buildHLSAndPlay(
-            videoURL: videoURL,
-            audioURL: audioURL,
-            videoFormat: format,
-            audioFormat: audioFormat,
-            headers: playbackFacade.activePlaybackHeaders,
-            quality: label
-        )
-    }
-
     func configurePopover(
         for alert: UIAlertController,
         sourceView: UIView?
@@ -217,16 +131,6 @@ extension WatchViewController: VideoPlayerViewDelegate {
             width: 1,
             height: 1
         )
-    }
-
-    func qualityLabel(for format: DashFormatInfo) -> String {
-        guard let height = format.height else {
-            return "itag \(format.itag)"
-        }
-        if let fps = format.fps, fps > 30 {
-            return "\(height)p\(fps)"
-        }
-        return "\(height)p"
     }
 }
 

@@ -7,10 +7,8 @@ import Foundation
 /// WatchViewController conforms to this protocol.
 protocol PlaybackContext: AnyObject {
     func attachPlayer(url: URL)
-    func attachProxiedHLS(
-        manifestURL: URL,
-        nSolver: (unsolved: String, solved: String)?
-    )
+    /// Attaches a source-prepared item, retaining its resource loader.
+    func attachPrepared(_ prepared: PreparedPlayback)
     func attachDirectPlayer(
         url: URL,
         visitorData: String?,

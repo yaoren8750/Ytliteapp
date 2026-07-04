@@ -46,6 +46,9 @@ enum BackgroundPlaybackMode {
 final class PlaybackFacade {
     weak var context: PlaybackContext?
     var activePlaybackInfo: DirectPlaybackInfo?
+    /// The active `VideoSource` (new pipeline). nil while the legacy strategy
+    /// pipeline is in use (android_vr / progressive).
+    var activeVideoSource: VideoSource?
     var activePlaybackClient: DirectPlaybackClient = .androidVR
     var activePlaybackHeaders: [String: String] = [:]
     var activeVideoFormat: DashFormatInfo?
@@ -114,35 +117,34 @@ extension PlaybackFacade {
         cancellationToken: CancellationToken
     ) {
         activeDirectPlaybackClient = .web
+        let source = WebViewHLSSource()
+        activeVideoSource = source
         context?.updateStatusLabel("Resolving stream...")
-        HLSStreamResolver.shared.resolve(
-            videoId: videoId
+        source.loadPlayback(
+            videoId: videoId,
+            cancellation: cancellationToken
         ) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self,
                       !cancellationToken.isCancelled else {
                     return
                 }
-                self.handleResolvedHLS(result)
+                self.handlePrepared(result)
             }
         }
     }
 
-    private func handleResolvedHLS(
-        _ result: Result<ResolvedHLS, Error>
+    private func handlePrepared(
+        _ result: Result<PreparedPlayback, Error>
     ) {
         switch result {
-        case .success(let resolved):
-            AppLog.player("webViewHLS: playing via proxy")
-            context?.attachProxiedHLS(
-                manifestURL: resolved.manifestURL,
-                nSolver: resolved.nSolver
-            )
+        case .success(let prepared):
+            let count = activeVideoSource?.availableQualities.count ?? 0
+            AppLog.player("webViewHLS: playing via source, \(count) qualities")
+            context?.attachPrepared(prepared)
         case .failure(let error):
             AppLog.player("webViewHLS failed: \(error)")
-            context?.showPlaybackError(
-                "HLS resolve failed."
-            )
+            context?.showPlaybackError("HLS resolve failed.")
         }
     }
 
@@ -151,6 +153,7 @@ extension PlaybackFacade {
         backgroundAudioItem = nil
         hlsPlaylistLoader = nil
         activePlaybackInfo = nil
+        activeVideoSource = nil
         activeVideoFormat = nil
         activePlaybackHeaders = [:]
         backgroundRestoreTime = .zero

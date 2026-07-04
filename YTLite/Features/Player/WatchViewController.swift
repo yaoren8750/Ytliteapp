@@ -56,8 +56,9 @@ final class WatchViewController: UIViewController {
     var visibleCommentsCount = 10
     let commentsPageSize = 10
     var videoPlayerView: VideoPlayerView?
-    /// Retains the active HLS proxy loader (AVURLAsset holds its delegate weakly).
-    var hlsProxyLoader: HLSProxyLoader?
+    /// Retains the active resource loader (AVURLAsset holds its delegate weakly),
+    /// e.g. a source's HLS proxy.
+    var activeResourceLoader: AVAssetResourceLoaderDelegate?
     var statusObservation: NSKeyValueObservation?
     var descriptionExpanded = false
     var isLoadingComments = false

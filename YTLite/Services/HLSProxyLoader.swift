@@ -49,6 +49,9 @@ final class HLSProxyLoader: NSObject, AVAssetResourceLoaderDelegate {
 
     let userAgent: String
     let nSolver: (unsolved: String, solved: String)?
+    /// When set, the multivariant manifest is filtered to only the variant whose
+    /// RESOLUTION height matches — forcing that quality instead of AVPlayer ABR.
+    var selectedHeight: Int?
 
     init(userAgent: String, nSolver: (unsolved: String, solved: String)?) {
         self.userAgent = userAgent

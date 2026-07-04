@@ -59,23 +59,53 @@ extension HLSProxyLoader {
     }
 
     private func proxyingChildURIs(in text: String) -> String {
-        let lines = text.components(separatedBy: "\n").map { line -> String in
-            if line.hasPrefix("#EXT-X-MEDIA:") {
-                return line
-                    .replacingOccurrences(
-                        of: "URI=\"https://",
-                        with: "URI=\"\(HLSProxy.scheme)://"
-                    )
+        let lines = text.components(separatedBy: "\n")
+        var out: [String] = []
+        var index = 0
+        while index < lines.count {
+            let line = lines[index]
+            if line.hasPrefix("#EXT-X-STREAM-INF") {
+                let uri = index + 1 < lines.count ? lines[index + 1] : ""
+                if keepVariant(streamInf: line) {
+                    out.append(line)
+                    out.append(proxied(uri))
+                }
+                index += 2
+                continue
             }
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-            if !trimmed.isEmpty, trimmed.hasPrefix("https://") {
-                return trimmed.replacingOccurrences(
-                    of: "https://",
-                    with: "\(HLSProxy.scheme)://"
-                )
-            }
-            return line
+            out.append(
+                line.hasPrefix("#EXT-X-MEDIA:") ? proxiedMedia(line) : line
+            )
+            index += 1
         }
-        return lines.joined(separator: "\n")
+        return out.joined(separator: "\n")
+    }
+
+    /// Keeps every variant during ABR; when a height is pinned, keeps only the
+    /// variants at that resolution (forcing e.g. 1080p over AVPlayer's ABR).
+    private func keepVariant(streamInf: String) -> Bool {
+        guard let height = selectedHeight else {
+            return true
+        }
+        let match = HLSStreamResolver.firstMatch(
+            in: streamInf, pattern: "RESOLUTION=[0-9]+x([0-9]+)"
+        )
+        return match.flatMap(Int.init) == height
+    }
+
+    private func proxied(_ uri: String) -> String {
+        let trimmed = uri.trimmingCharacters(in: .whitespaces)
+        guard trimmed.hasPrefix("https://") else {
+            return uri
+        }
+        return trimmed.replacingOccurrences(
+            of: "https://", with: "\(HLSProxy.scheme)://"
+        )
+    }
+
+    private func proxiedMedia(_ line: String) -> String {
+        line.replacingOccurrences(
+            of: "URI=\"https://", with: "URI=\"\(HLSProxy.scheme)://"
+        )
     }
 }
