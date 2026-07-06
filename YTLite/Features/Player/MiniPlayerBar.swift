@@ -18,6 +18,7 @@ final class MiniPlayerBar: UIView {
     var onTap: (() -> Void)?
 
     private var playerLayer: AVPlayerLayer?
+    private weak var player: AVPlayer?
 
     // MARK: - Init
 
@@ -30,6 +31,18 @@ final class MiniPlayerBar: UIView {
             self,
             selector: #selector(applyTheme),
             name: ThemeManager.didChangeNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appWillResignActive),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
         applyTheme()
@@ -52,6 +65,7 @@ final class MiniPlayerBar: UIView {
     func attachPlayer(_ player: AVPlayer?) {
         playerLayer?.removeFromSuperlayer()
         playerLayer = nil
+        self.player = player
         guard let newPlayer = player else {
             return
         }
@@ -60,6 +74,21 @@ final class MiniPlayerBar: UIView {
         videoContainer.layer.insertSublayer(layer, at: 1)
         playerLayer = layer
         setNeedsLayout()
+    }
+
+    /// iOS pauses a backgrounded player that still drives a layer; detach
+    /// while inactive so background audio keeps running when the panel is
+    /// minimized (the main player view does the same for its own layer).
+    @objc
+    private func appWillResignActive() {
+        playerLayer?.player = nil
+    }
+
+    @objc
+    private func appDidBecomeActive() {
+        if let player, playerLayer?.player == nil {
+            playerLayer?.player = player
+        }
     }
 
     func update(title: String, channel: String, isPlaying: Bool, thumbnailURL: String) {
