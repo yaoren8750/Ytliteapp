@@ -104,7 +104,16 @@ extension RotatingNavigationController: UIGestureRecognizerDelegate {
 extension RotatingNavigationController: UINavigationControllerDelegate {
     private static func realignChevron(of viewController: UIViewController?) {
         let item = viewController?.navigationItem.leftBarButtonItem
-        (item?.customView as? NavChevronButton)?.realign()
+        guard let chevron = item?.customView as? NavChevronButton else {
+            return
+        }
+        chevron.realign()
+        // The bar can move the item's wrapper once more within the same
+        // layout pass (invisible to the view's own overrides); one more
+        // pass on the next tick catches it.
+        DispatchQueue.main.async { [weak chevron] in
+            chevron?.realign()
+        }
     }
 
     func navigationController(
@@ -112,15 +121,24 @@ extension RotatingNavigationController: UINavigationControllerDelegate {
         willShow viewController: UIViewController,
         animated: Bool
     ) {
+        Self.realignChevron(of: viewController)
         guard let coordinator = navigationController.transitionCoordinator else {
             return
         }
-        coordinator.animate(alongsideTransition: nil) { context in
-            let shown = context.isCancelled
-                ? navigationController.topViewController
-                : viewController
-            Self.realignChevron(of: shown)
-        }
+        // Inside the animation block, so if the slot moved after the first
+        // measurement the chevron glides into place with the push instead
+        // of visibly jumping after it.
+        coordinator.animate(
+            alongsideTransition: { _ in
+                Self.realignChevron(of: viewController)
+            },
+            completion: { context in
+                let shown = context.isCancelled
+                    ? navigationController.topViewController
+                    : viewController
+                Self.realignChevron(of: shown)
+            }
+        )
     }
 
     func navigationController(
