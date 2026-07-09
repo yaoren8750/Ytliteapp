@@ -195,7 +195,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = WD55N799QB;
+				DEVELOPMENT_TEAM = 4RAT6786W6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YTLite/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = YTLite;
@@ -209,7 +209,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.verback.YTLite.test;
 				PRODUCT_NAME = YTLite;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -231,7 +231,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = WD55N799QB;
+				DEVELOPMENT_TEAM = 4RAT6786W6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YTLite/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = YTLite;
@@ -245,7 +245,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.verback.YTLite.test;
 				PRODUCT_NAME = YTLite;
 				PROVISIONING_PROFILE_SPECIFIER = "";
