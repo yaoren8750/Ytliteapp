@@ -32,10 +32,9 @@ enum CommentViewBuilder {
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
         view.translatesAutoresizingMaskIntoConstraints = false
-        if let urlStr = comment.authorAvatarURL,
-           let url = URL(string: urlStr) {
-            view.setImage(url: url)
-        }
+        let url = comment.authorAvatarURL
+            .flatMap { URL(string: $0) }
+        view.setAvatar(url: url, name: comment.authorName)
         return view
     }
 

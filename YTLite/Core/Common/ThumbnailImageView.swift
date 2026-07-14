@@ -6,18 +6,14 @@ class ThumbnailImageView: UIImageView {
     /// Injectable transport for image fetches (media plane, undecorated).
     static var transport: HTTPTransport = ServiceContainer.mediaTransport
 
-    static var cachingEnabled: Bool {
-        UserDefaults.standard.object(
-            forKey: UserDefaultsKeys.Cache.imageCacheEnabled
-        ) as? Bool ?? true
-    }
-
     /// Maximum pixel dimension for downsampling.
     /// Thumbnails get 640, avatars get 96.
     var maxPixelSize: Int = 640
 
     private var currentURL: URL?
     private var loadToken: CancellationToken?
+    private var fallbackImage: UIImage?
+    private var isShowingFallback = false
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,33 +27,21 @@ class ThumbnailImageView: UIImageView {
         fatalError("init(coder:) is not supported")
     }
 
-    static func clearCache() {
-        AppLog.img("clear all")
-        cache.removeAll()
-        diskCache.clear()
-    }
-
-    static func invalidate(url: String) {
-        cache.remove(url: url)
-        diskCache.remove(url: url)
-    }
-
-    func setImage(url: URL) {
-        if currentURL == url,
-           image != nil || loadToken != nil {
+    func setImage(url: URL, fallback: UIImage? = nil) {
+        fallbackImage = fallback
+        let hasContent = (image != nil && !isShowingFallback)
+            || loadToken != nil
+        if currentURL == url, hasContent {
             return
         }
         loadToken?.cancel()
         loadToken = nil
         currentURL = url
+        if let fallback {
+            image = fallback
+            isShowingFallback = true
+        }
         loadFromMemoryOrDisk(url: url)
-    }
-
-    func cancel() {
-        loadToken?.cancel()
-        loadToken = nil
-        currentURL = nil
-        image = nil
     }
 
     private func loadFromMemoryOrDisk(url: URL) {
@@ -67,6 +51,7 @@ class ThumbnailImageView: UIImageView {
         ) {
             AppLog.img("mem-hit \(url.lastPathComponent)")
             image = cached
+            isShowingFallback = false
             loadToken = nil
             return
         }
@@ -123,15 +108,25 @@ class ThumbnailImageView: UIImageView {
             }
             self?.loadToken = nil
             self?.image = img
+            self?.isShowingFallback = false
         }
     }
 
+    /// Before a network fetch: show the fallback (if any) so a
+    /// failed load leaves the monogram, not an empty view.
     private func clearImageOnMain(url: URL) {
         DispatchQueue.main.async { [weak self] in
-            guard self?.currentURL == url else {
+            guard let self,
+                  currentURL == url
+            else {
                 return
             }
-            self?.image = nil
+            if let fallbackImage {
+                image = fallbackImage
+                isShowingFallback = true
+            } else {
+                image = nil
+            }
         }
     }
 
@@ -207,11 +202,56 @@ class ThumbnailImageView: UIImageView {
             )
         }
         DispatchQueue.main.async { [weak self] in
-            guard self?.currentURL == url else {
+            guard let self,
+                  currentURL == url,
+                  let img = ThumbnailImageView.cache
+                  .object(forKey: cacheKey)
+            else {
                 return
             }
-            self?.image = ThumbnailImageView.cache
-                .object(forKey: cacheKey)
+            image = img
+            isShowingFallback = false
         }
+    }
+}
+
+extension ThumbnailImageView {
+    static var cachingEnabled: Bool {
+        UserDefaults.standard.object(
+            forKey: UserDefaultsKeys.Cache.imageCacheEnabled
+        ) as? Bool ?? true
+    }
+
+    static func clearCache() {
+        AppLog.img("clear all")
+        cache.removeAll()
+        diskCache.clear()
+    }
+
+    static func invalidate(url: String) {
+        cache.remove(url: url)
+        diskCache.remove(url: url)
+    }
+
+    func cancel() {
+        loadToken?.cancel()
+        loadToken = nil
+        currentURL = nil
+        fallbackImage = nil
+        isShowingFallback = false
+        image = nil
+    }
+
+    /// Shows the avatar at `url`, using a monogram rendered from
+    /// `name` while loading, on failure, and when `url` is nil.
+    func setAvatar(url: URL?, name: String) {
+        let monogram = MonogramAvatar.image(for: name)
+        guard let url else {
+            cancel()
+            image = monogram
+            isShowingFallback = true
+            return
+        }
+        setImage(url: url, fallback: monogram)
     }
 }
