@@ -152,7 +152,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--debs", required=True, type=Path, help="directory with .deb files")
     parser.add_argument("--out", required=True, type=Path, help="output directory for the repo")
-    parser.add_argument("--repo-url", default="https://verback2308.github.io/YTLite/")
+    # Must be all-lowercase: Sileo/Cydia lowercase user-entered source URLs
+    # and GitHub Pages paths are case-sensitive.
+    parser.add_argument("--repo-url", default="https://verback2308.github.io/ytlite/")
     args = parser.parse_args()
 
     debs = sorted(args.debs.glob("*.deb"))

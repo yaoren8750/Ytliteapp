@@ -7,7 +7,9 @@ name: Publish Cydia/Sileo repo
 # can install any released version, not just the latest.
 #
 # One-time setup: repo Settings → Pages → Source: "GitHub Actions".
-# Repo URL for package managers: https://verback2308.github.io/YTLite/
+# Repo URL for package managers: https://verback2308.github.io/ytlite/
+# (all-lowercase on purpose: Sileo/Cydia lowercase entered URLs and GitHub
+# Pages paths are case-sensitive — hence the lowercase repository name).
 
 on:
   release:
