@@ -62,8 +62,10 @@ extension InnertubeClient {
         guard let videoId = lockup["contentId"] as? String,
               let title = playlistTitle(from: lockup)
         else { return nil }
-        let thumbnail = lockupVideoThumbnailURL(from: lockup)
-            ?? "https://i.ytimg.com/vi/\(videoId)/hqdefault.jpg"
+        let thumbnail = preferredThumbnailURL(
+            videoId: videoId,
+            fallbackURL: lockupVideoThumbnailURL(from: lockup) ?? ""
+        )
         let (duration, isLive) = lockupVideoDuration(from: lockup)
         let (viewCount, publishedAt) = lockupVideoMeta(from: lockup)
         return Video(
@@ -80,10 +82,20 @@ extension InnertubeClient {
         )
     }
 
+    /// Video lockups keep their thumbnail under `contentImage`
+    /// (2026-07 shape) or `thumbnail` (older responses).
+    private static func lockupThumbnailViewModel(
+        from lockup: [String: Any]
+    ) -> [String: Any]? {
+        lockup.digDict("contentImage", "thumbnailViewModel")
+            ?? lockup.digDict("thumbnail", "thumbnailViewModel")
+    }
+
     private static func lockupVideoDuration(
         from lockup: [String: Any]
     ) -> (duration: String?, isLive: Bool) {
-        let overlays = lockup.digArray("thumbnail", "thumbnailViewModel", "overlays") ?? []
+        let overlays = lockupThumbnailViewModel(from: lockup)?["overlays"]
+            as? [[String: Any]] ?? []
         for overlay in overlays {
             if let badge = durationFromBadge(overlay) {
                 return badge
@@ -134,8 +146,8 @@ extension InnertubeClient {
     }
 
     private static func lockupVideoThumbnailURL(from lockup: [String: Any]) -> String? {
-        let url = lockup.digString(
-            "thumbnail", "thumbnailViewModel", "image", "sources", 0, JSONKey.url
+        let url = lockupThumbnailViewModel(from: lockup)?.digString(
+            "image", "sources", 0, JSONKey.url
         )
         return url.map(normalizeThumbnailURL)
     }

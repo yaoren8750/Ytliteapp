@@ -168,9 +168,9 @@ private extension InnertubeClient {
                 ?? tvInfo.subscriberCountText,
             bannerURL: webInfo.bannerURL ?? tvInfo.bannerURL,
             isVerified: webInfo.isVerified || tvInfo.isVerified,
-            description: webInfo.description,
-            contactInfo: webInfo.contactInfo,
-            videoCountText: webInfo.videoCountText
+            description: webInfo.description ?? tvInfo.description,
+            contactInfo: webInfo.contactInfo ?? tvInfo.contactInfo,
+            videoCountText: webInfo.videoCountText ?? tvInfo.videoCountText
         )
     }
 

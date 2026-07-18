@@ -80,7 +80,7 @@ struct ChannelInfo: Codable {
 }
 
 struct ChannelPage {
-    let info: ChannelInfo
+    var info: ChannelInfo
     let videosPage: FeedPage
     let subscribeButtonText: String?
     let isSubscribed: Bool

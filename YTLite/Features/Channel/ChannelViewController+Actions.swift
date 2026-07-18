@@ -4,6 +4,8 @@ import UIKit
 
 extension ChannelViewController {
     func applyChannelInfo(_ info: ChannelInfo) {
+        // Keep the About sheet in sync — it reads the page's info.
+        currentChannelPage?.info = info
         headerView.update(with: info, fallback: initialChannelName)
         title = info.title.isEmpty ? initialChannelName : info.title
         updateInfoBarButton(for: info)

@@ -29,6 +29,9 @@ extension InnertubeClient {
         fields.subscriberCountText = c4SubCount(
             c4: c4, ch: ch
         )
+        if let ch {
+            applyChannelHeaderExtras(ch, into: &fields)
+        }
         return buildChannelInfo(fields)
     }
 
