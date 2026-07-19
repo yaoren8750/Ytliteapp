@@ -69,6 +69,7 @@
 		<string>tr</string>
 		<string>uk</string>
 		<string>uz</string>
+		<string>vi</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
