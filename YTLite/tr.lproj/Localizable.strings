@@ -169,6 +169,7 @@
 /* Section headers */
 "settings.section.theme" = "Tema";
 "settings.section.playback" = "Oynatma";
+"settings.section.autoDub" = "Dublaj";
 "settings.section.home" = "Ana Sayfa";
 "settings.section.cache" = "Önbellek";
 "settings.section.ryd" = "Return YouTube Dislike";
@@ -179,6 +180,7 @@
 "settings.footer.themeAutoSystem" = "Otomatik olarak sistem görünümünü takip eder.";
 "settings.footer.themeAutoHours" = "Yukarıdaki saatler arasında otomatik olarak koyu temaya geçer.";
 "settings.footer.playback" = "Doldurma için yakınlaştırma, tam ekranda siyah çubuk kalmayacak şekilde videoyu otomatik olarak ölçekler. Oynatıcıda sıkıştırma her video için bunu geçersiz kılar.";
+"settings.footer.autoDub" = "Videonun orijinal dili dublaj dilinden farklıysa uygun ses parçası otomatik olarak seçilir.";
 "settings.footer.home" = "Öneri rafları nasıl gösterilir: sürekli bir ızgara veya TV tarzı yatay raylar.";
 "settings.footer.ryd" = "Beğenmeme sayıları Return YouTube Dislike (returnyoutubedislike.com) tarafından desteklenmektedir — açık bir topluluk projesi.";
 "settings.footer.debug" = "Belirli bir oynatma kaynağını zorla. Normalde Android VR otomatik geri dönüş ile kullanılır. Çözücü sunucusu Mobile Web + pot kaynağını besler (pot madenciliği ve iOS 12–13'te n-çözümleme).";
@@ -201,6 +203,11 @@
 "settings.row.hideStatusBar" = "Tam Ekranda Durum Çubuğunu Gizle";
 "settings.row.zoomToFill" = "Tam Ekranda Doldurma İçin Yakınlaştır";
 "settings.row.showShorts" = "Aboneliklerde YouTube Shorts Göster";
+
+/* Auto-dub rows: master toggle, dub-language picker, AI-dub exclusion */
+"settings.row.autoDub" = "Videoları dublajlı başlat";
+"settings.row.autoDubLanguage" = "Dublaj dili";
+"settings.row.autoDubIgnoreAI" = "Yapay zekâ dublajlarını yoksay";
 
 /* Home layout row + option names */
 "settings.row.homeLayout" = "Ana Sayfa Düzeni";
@@ -355,6 +362,7 @@
 /* ===== Settings: language section ===== */
 
 "settings.section.language" = "Dil";
+"settings.footer.language" = "Uygulama dili hem arayüzü hem içeriği değiştirir: başlıklar, arama ve akışlar bu dili izler (YouTube, resmi uygulamada olduğu gibi meta verileri sunucu tarafında çevirir). Değişiklikler uygulama yeniden başlatıldığında tam olarak uygulanır.";
 /* Rows */
 "settings.row.appLanguage" = "Uygulama Dili";
 "settings.row.region" = "Bölge";

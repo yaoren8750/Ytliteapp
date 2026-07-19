@@ -169,6 +169,7 @@
 /* Section headers */
 "settings.section.theme" = "主题";
 "settings.section.playback" = "播放";
+"settings.section.autoDub" = "配音";
 "settings.section.home" = "首页";
 "settings.section.cache" = "缓存";
 "settings.section.ryd" = "Return YouTube Dislike";
@@ -179,6 +180,7 @@
 "settings.footer.themeAutoSystem" = "自动跟随系统外观。";
 "settings.footer.themeAutoHours" = "在上述时间段自动切换到深色主题。";
 "settings.footer.playback" = "缩放以填充会自动缩放全屏视频以消除黑边。在播放器中捏合可按视频覆盖。";
+"settings.footer.autoDub" = "当视频的原始语言与配音语言不同时，会自动选择对应的音轨。";
 "settings.footer.home" = "推荐栏显示方式：连续网格或电视风格水平轨道。";
 "settings.footer.ryd" = "不喜欢次数由 Return YouTube Dislike (returnyoutubedislike.com) 提供 — 开放社区项目。";
 "settings.footer.debug" = "强制使用特定播放源。通常使用 Android VR 并自动回退。求解器服务器为 Mobile Web + pot 源提供支持（pot 铸造和 iOS 12–13 上的 n-solving）。";
@@ -201,6 +203,11 @@
 "settings.row.hideStatusBar" = "全屏时隐藏状态栏";
 "settings.row.zoomToFill" = "全屏时缩放以填充";
 "settings.row.showShorts" = "在订阅中显示 YouTube Shorts";
+
+/* Auto-dub rows: master toggle, dub-language picker, AI-dub exclusion */
+"settings.row.autoDub" = "以配音播放视频";
+"settings.row.autoDubLanguage" = "配音语言";
+"settings.row.autoDubIgnoreAI" = "忽略 AI 配音";
 
 /* Home layout row + option names */
 "settings.row.homeLayout" = "首页布局";
@@ -355,6 +362,7 @@
 /* ===== Settings: language section ===== */
 
 "settings.section.language" = "语言";
+"settings.footer.language" = "应用语言会同时改变界面和内容：标题、搜索和信息流都会随之变化（与官方应用一样，YouTube 会在服务器端翻译元数据）。更改在重启应用后完全生效。";
 /* Rows */
 "settings.row.appLanguage" = "应用语言";
 "settings.row.region" = "地区";

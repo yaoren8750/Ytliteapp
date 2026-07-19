@@ -165,6 +165,7 @@
 /* Section headers */
 "settings.section.theme" = "Apariencia";
 "settings.section.playback" = "Reproducción";
+"settings.section.autoDub" = "Doblaje";
 "settings.section.home" = "Inicio";
 "settings.section.cache" = "Caché";
 "settings.section.ryd" = "Return YouTube Dislike";
@@ -175,6 +176,7 @@
 "settings.footer.themeAutoSystem" = "Sigue automáticamente la apariencia del sistema.";
 "settings.footer.themeAutoHours" = "Cambia automáticamente al tema oscuro entre las horas indicadas.";
 "settings.footer.playback" = "Ampliar para rellenar escala el video en pantalla completa para que no queden barras negras. El pellizco en el reproductor lo anula por video.";
+"settings.footer.autoDub" = "Si el idioma original de un vídeo difiere del idioma de doblaje, la pista de audio correspondiente se selecciona automáticamente.";
 "settings.footer.home" = "Cómo se muestran los estantes de recomendaciones: una cuadrícula continua o carriles horizontales estilo TV.";
 "settings.footer.ryd" = "Los recuentos de dislikes están impulsados por Return YouTube Dislike (returnyoutubedislike.com) — un proyecto comunitario abierto.";
 "settings.footer.debug" = "Forzar una fuente de reproducción específica. Normalmente se usa Android VR con respaldo automático. El servidor resolutor alimenta la fuente Mobile Web + pot (creación de pot y n-solving en iOS 12–13).";
@@ -197,6 +199,11 @@
 "settings.row.hideStatusBar" = "Ocultar barra de estado en pantalla completa";
 "settings.row.zoomToFill" = "Ampliar para rellenar en pantalla completa";
 "settings.row.showShorts" = "Mostrar YouTube Shorts en Suscripciones";
+
+/* Auto-dub rows: master toggle, dub-language picker, AI-dub exclusion */
+"settings.row.autoDub" = "Iniciar los vídeos doblados";
+"settings.row.autoDubLanguage" = "Idioma del doblaje";
+"settings.row.autoDubIgnoreAI" = "Ignorar doblajes con IA";
 
 /* Home layout row + option names */
 "settings.row.homeLayout" = "Diseño de inicio";
@@ -351,6 +358,7 @@
 /* ===== Settings: language section ===== */
 
 "settings.section.language" = "Idioma";
+"settings.footer.language" = "El idioma de la aplicación cambia tanto la interfaz como el contenido: los títulos, la búsqueda y los feeds lo siguen (YouTube traduce los metadatos en el servidor, como la app oficial). Los cambios se aplican por completo tras reiniciar la app.";
 /* Rows */
 "settings.row.appLanguage" = "Idioma de la app";
 "settings.row.region" = "Región";

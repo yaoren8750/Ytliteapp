@@ -169,6 +169,7 @@
 /* Section headers */
 "settings.section.theme" = "テーマ";
 "settings.section.playback" = "再生";
+"settings.section.autoDub" = "吹き替え";
 "settings.section.home" = "ホーム";
 "settings.section.cache" = "キャッシュ";
 "settings.section.ryd" = "Return YouTube Dislike";
@@ -179,6 +180,7 @@
 "settings.footer.themeAutoSystem" = "システムの外観に自動で従います。";
 "settings.footer.themeAutoHours" = "上記の時間帯に暗いテーマに自動で切り替わります。";
 "settings.footer.playback" = "ズームでフィルはフルスクリーン時にビデオを自動的にスケーヱーし、黒いバーをなくします。プレーヤーでピンチすると、ビデオごとに上書きされます。";
+"settings.footer.autoDub" = "動画の元の言語が吹き替え言語と異なる場合、対応する音声トラックが自動的に選択されます。";
 "settings.footer.home" = "おすすめシェルフの表示方法: 連続したグリッドまたはTVスタイルの水平レール。";
 "settings.footer.ryd" = "低評価数は Return YouTube Dislike (returnyoutubedislike.com) によって提供されています — オープンコミュニティプロジェクト。";
 "settings.footer.debug" = "特定の再生ソースを強制。通常は Android VR が自動フォールバックで使用されます。ソルバーサーバーは Mobile Web + pot ソース（ポット発行、iOS 12–13でのn-solving）を提供します。";
@@ -201,6 +203,11 @@
 "settings.row.hideStatusBar" = "フルスクリーンでステータスバーを隠す";
 "settings.row.zoomToFill" = "フルスクリーンでズームしてフィル";
 "settings.row.showShorts" = "登録チャンネルでYouTube Shortsを表示";
+
+/* Auto-dub rows: master toggle, dub-language picker, AI-dub exclusion */
+"settings.row.autoDub" = "動画を吹き替えで再生";
+"settings.row.autoDubLanguage" = "吹き替えの言語";
+"settings.row.autoDubIgnoreAI" = "AI吹き替えを無視";
 
 /* Home layout row + option names */
 "settings.row.homeLayout" = "ホームレイアウト";
@@ -355,6 +362,7 @@
 /* ===== Settings: language section ===== */
 
 "settings.section.language" = "言語";
+"settings.footer.language" = "アプリの言語はインターフェースとコンテンツの両方に適用されます。タイトル、検索、フィードもそれに従います（公式アプリと同様、YouTubeがメタデータをサーバー側で翻訳します）。変更はアプリの再起動後に完全に適用されます。";
 /* Rows */
 "settings.row.appLanguage" = "アプリの言語";
 "settings.row.region" = "地域";
