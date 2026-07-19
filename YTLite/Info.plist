@@ -13,6 +13,7 @@
 		<string>az</string>
 		<string>be</string>
 		<string>bg</string>
+		<string>bn</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
