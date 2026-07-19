@@ -51,6 +51,7 @@
 		<string>ne</string>
 		<string>nl</string>
 		<string>no</string>
+		<string>pa</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
