@@ -49,9 +49,9 @@ When Google dropped support for the official YouTube app on older devices, there
 - **Picture-in-Picture** — watch while using other apps
 - **SponsorBlock** — skip sponsored segments automatically
 - **Return YouTube Dislike** — see dislike counts again
-- **Audio tracks** — switch dubbed audio on multi-language videos; AI auto-dubs are marked "(AI)"
+- **Audio tracks** — switch dubbed audio on multi-language videos, or start videos dubbed in your language automatically; AI auto-dubs are marked "(AI)"
 - **Subtitles** — full subtitle/caption support with VTT parsing
-- **67 languages** — localized interface, with video titles/search/feeds following your language (see [Localization](#localization))
+- **10 languages** — localized interface, with video titles/search/feeds following your language (see [Localization](#localization))
 - **Search & browse** — live suggestions, recent-search history, filters (sort, upload date, type, duration), channel pages, playlists
 - **Smart home feed** — endless recommendations with category chips read from your feed's shelves
 - **Subscriptions** — follow channels with a local subscription feed
@@ -154,28 +154,16 @@ The interface follows your system language by default and can be overridden in *
 > All translations except English, Russian and Ukrainian were produced with LLM assistance and then review-passed — mistakes are still possible. If you spot a wrong or awkward translation, please [open an issue](../../issues) describing where it appears and what the correct wording should be. To improve a whole language (or add a new one), see [TRANSLATING.md](TRANSLATING.md).
 
 <details>
-<summary><b>Available in 67 languages</b></summary>
+<summary><b>Available in 10 languages</b></summary>
 <br>
 
 | | | | |
 |---|---|---|---|
-| `en` English | `ru` Русский | `af` Afrikaans | `am` አማርኛ |
-| `az` Azərbaycanca | `be` Беларуская | `bg` Български | `bn` বাংলা |
-| `bs` Bosanski | `ca` Català | `cs` Čeština | `da` Dansk |
-| `de` Deutsch | `el` Ελληνικά | `es` Español | `et` Eesti |
-| `eu` Euskara | `fi` Suomi | `fr` Français | `ga` Gaeilge |
-| `gl` Galego | `gu` ગુજરાતી | `hi` हिन्दी | `hr` Hrvatski |
-| `hu` Magyar | `id` Bahasa Indonesia | `is` Íslenska | `it` Italiano |
-| `ja` 日本語 | `kk` Қазақша | `km` ភាសាខ្មែរ | `ko` 한국어 |
-| `ky` Кыргызча | `lo` ລາວ | `lt` Lietuvių | `lv` Latviešu |
-| `mk` Македонски | `ml` മലയാളം | `mn` Монгол | `mr` मराठी |
-| `ms` Bahasa Melayu | `my` မြန်မာ | `ne` नेपाली | `nl` Nederlands |
-| `no` Norsk | `pa` ਪੰਜਾਬੀ | `pl` Polski | `pt` Português |
-| `ro` Română | `si` සිංහල | `sk` Slovenčina | `sl` Slovenščina |
-| `sq` Shqip | `sr` Српски | `sv` Svenska | `sw` Kiswahili |
-| `ta` தமிழ் | `te` తెలుగు | `th` ไทย | `tl` Filipino |
-| `tr` Türkçe | `uk` Українська | `uz` Oʻzbekcha | `vi` Tiếng Việt |
-| `zh-Hans` 简体中文 | `zh-Hant` 繁體中文 | `zu` isiZulu | |
+| `en` English | `ru` Русский | `uk` Українська | `de` Deutsch |
+| `es` Español | `fr` Français | `ja` 日本語 | `pt` Português |
+| `tr` Türkçe | `zh-Hans` 简体中文 | | |
+
+Translations for 57 more languages are prepared on the `archive/all-languages` branch — if you want one of them shipped, [open an issue](../../issues).
 
 </details>
 
