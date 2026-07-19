@@ -229,6 +229,13 @@ private extension InnertubeClient {
             viewCount = text
         } else if isPublishedText(text) {
             publishedAt = text
+        } else if viewCount == nil {
+            // Unrecognized language (no ContentKeywords table): keep the
+            // server text instead of dropping it — the metadata line order
+            // is "views, date". Only chronological SORTING needs a table.
+            viewCount = text
+        } else if publishedAt == nil {
+            publishedAt = text
         }
     }
 
